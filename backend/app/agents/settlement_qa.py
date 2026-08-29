@@ -21,9 +21,27 @@ Return JSON: decision (one of ANSWER, HUMAN_REVIEW), confidence, reason_code, re
 
 def ask(db: Session, question: str) -> dict:
     q = (question or "").strip()
-    tx_ids = re.findall(r"TX[_-]?\d+", q.upper().replace("-", "_"))
+    q_upper = q.upper().replace("-", "_")
     actions: list[dict] = []
     facts: dict = {"question": q}
+
+    # --- Multi-signal entity extraction ---
+    # 1. Transaction IDs
+    tx_ids = re.findall(r"TX[_-]?\d+", q_upper)
+    # 2. Invoice IDs
+    inv_ids = re.findall(r"INV[_-]?\d+", q_upper)
+    # 3. Amount patterns (₹ 1,23,456 / INR 500.00 / bare decimals)
+    amounts = re.findall(r"(?:₹|INR\s*)[\d,]+(?:\.\d+)?|\b\d{4,}(?:\.\d+)?\b", q)
+    # 4. Vendor name lookup from DB (fuzzy: any vendor name token found in question)
+    from sqlalchemy import select as _sel
+    from app.models import Vendor as _Vendor
+    all_vendors = db.execute(_sel(_Vendor)).scalars().all()
+    matched_vendor = None
+    for v in all_vendors:
+        names = [v.legal_name] + (v.aliases or [])
+        if any(n.lower() in q.lower() for n in names if len(n) > 3):
+            matched_vendor = v
+            break
 
     if tx_ids:
         tid = tx_ids[0] if tx_ids[0].startswith("TX_") else f"TX_{tx_ids[0][2:]}"
@@ -55,6 +73,7 @@ def ask(db: Session, question: str) -> dict:
             facts["exception"] = (
                 {
                     "id": exc.id,
+                    "tx": exc.transaction_id,
                     "type": exc.exception_type,
                     "reason": exc.reason,
                     "final_decision": exc.final_decision,
@@ -71,6 +90,23 @@ def ask(db: Session, question: str) -> dict:
                     )
         actions.append({"tool": "search_transactions", "id": tid})
         actions.append({"tool": "search_settlement", "id": tid})
+
+    elif inv_ids:
+        # Invoice-keyed question
+        iid = inv_ids[0] if inv_ids[0].startswith("INV_") else inv_ids[0].replace("INV-", "INV_")
+        facts["invoices"] = tools.search_invoice(db, id=iid)
+        if facts["invoices"]:
+            inv = facts["invoices"][0]
+            facts["settlements"] = tools.search_settlement(db, vendor_id=inv.get("vendor_id"))
+        actions.append({"tool": "search_invoice", "id": iid})
+
+    elif matched_vendor:
+        # Vendor-keyed question
+        facts["vendor"] = tools.search_vendor(db, vendor_id=matched_vendor.id)
+        facts["invoices"] = tools.search_invoice(db, vendor_id=matched_vendor.id)
+        facts["settlements"] = tools.search_settlement(db, vendor_id=matched_vendor.id)
+        actions.append({"tool": "search_vendor", "vendor": matched_vendor.legal_name})
+
     else:
         facts["recent_unresolved"] = [
             {"id": e.id, "tx": e.transaction_id, "type": e.exception_type, "reason": e.reason[:200]}
@@ -81,6 +117,12 @@ def ask(db: Session, question: str) -> dict:
             for d in db.execute(select(Decision).where(Decision.decision == "AUTO_RESOLVE").limit(5)).scalars()
         ]
         actions.append({"tool": "list_exceptions"})
+
+    # Surface extracted signals into facts for LLM context
+    if amounts:
+        facts["amounts_mentioned"] = amounts
+    if inv_ids:
+        facts["invoice_ids_mentioned"] = inv_ids
 
     deterministic = _deterministic_answer(q, facts)
     if deterministic:

@@ -54,6 +54,7 @@ def close_books(db: Session, run: ReconciliationRun, investigate_exceptions: boo
     det_resolutions = 0
     ai_resolutions = 0
     inv_times = []
+    inv_retrieval_ms: list[int] = []
 
     for i, tx in enumerate(txs):
         cands = match_transaction(db, tx, invoices, vendors, by_ref, by_vendor)
@@ -101,8 +102,11 @@ def close_books(db: Session, run: ReconciliationRun, investigate_exceptions: boo
             gated = None
             if investigate_exceptions and band in {"INVESTIGATE", "AMBIGUOUS"}:
                 t_inv = perf_counter()
+                t_rag_start = perf_counter()
                 gated = investigate(db, run.id, exc, tx, {inv.id: inv for inv in invoices})
-                inv_times.append(int((perf_counter() - t_inv) * 1000))
+                t_inv_end = perf_counter()
+                inv_times.append(int((t_inv_end - t_inv) * 1000))
+                inv_retrieval_ms.append(int((t_inv_end - t_rag_start) * 1000))
                 if gated.reason_code == "CONTRACTUAL_VARIANCE":
                     det_resolutions += 1
                 else:
@@ -171,7 +175,7 @@ def close_books(db: Session, run: ReconciliationRun, investigate_exceptions: boo
         "llm_calls_saved_pct": llm_saved,
         "avg_investigation_ms": (sum(inv_times) / len(inv_times)) if inv_times else 0,
         "avg_llm_calls_per_exception": (llm_calls / counters["exceptions"]) if counters["exceptions"] else 0,
-        "avg_retrieval_latency_ms": 12,
+        "avg_retrieval_latency_ms": (sum(inv_retrieval_ms) // len(inv_retrieval_ms)) if inv_retrieval_ms else 0,
         "ocr_extraction_accuracy": None,
     }
     run.finished_at = utcnow()

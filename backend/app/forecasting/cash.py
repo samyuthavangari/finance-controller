@@ -66,13 +66,11 @@ def forecast(
     min_bal = cash
     min_date = as_of.isoformat()
     running = cash
+    daily_expense = money(monthly / Decimal("30"))
     for i in range(horizon + 1):
         day = as_of + timedelta(days=i)
         day_delta = sum((x["amount"] for x in adjusted if x["date"] == day), Decimal("0"))
-        if day.day == 1 or i == 0:
-            day_delta -= monthly / Decimal("30")
-        else:
-            day_delta -= monthly / Decimal("30")
+        day_delta -= daily_expense
         running = money(running + day_delta)
         series.append({"date": day.isoformat(), "cash": f"{running:.2f}"})
         if running < min_bal:

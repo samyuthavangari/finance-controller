@@ -248,6 +248,102 @@ def _rule_or_llm(exc, tx, facts, rag, calcs, known_ids) -> AgentDecision:
             evidence=[EvidenceItem(source="transaction", id=tx.id)],
             calculations={},
         )
+    # --- DATE_MISMATCH: deterministic date-gap check ---
+    if exc.exception_type == "DATE_MISMATCH":
+        inv0_list = facts["invoices"][0] if facts["invoices"] else []
+        inv0 = inv0_list[0] if inv0_list else None
+        if inv0 and tx.txn_date and inv0.get("date"):
+            from datetime import date as _date
+            try:
+                inv_date = _date.fromisoformat(inv0["date"])
+                gap_days = abs((tx.txn_date - inv_date).days)
+                # Grace period: up to 7 days is acceptable in practice (payment cycles)
+                grace = 7
+                contract_hit = next((h for h in rag if (h.get("payload") or {}).get("document_type") == "vendor_contract"), None)
+                if contract_hit:
+                    # If contract exists, use 14-day grace (net-14 terms)
+                    grace = 14
+                ev = [
+                    EvidenceItem(source="transaction", id=tx.id),
+                    EvidenceItem(source="invoice", id=exc.candidate_invoice_ids[0]) if exc.candidate_invoice_ids else EvidenceItem(source="transaction", id=tx.id),
+                ]
+                if contract_hit:
+                    ev.append(EvidenceItem(source="contract", id=(contract_hit.get("payload") or {}).get("document_id") or str(contract_hit["id"]), section="payment terms"))
+                calcs_date = {
+                    "invoice_date": inv0["date"],
+                    "transaction_date": tx.txn_date.isoformat(),
+                    "date_gap_days": str(gap_days),
+                    "allowed_grace_days": str(grace),
+                }
+                if gap_days <= grace:
+                    return AgentDecision(
+                        decision="AUTO_RESOLVE",
+                        confidence=0.90,
+                        reason_code="CONTRACTUAL_VARIANCE",
+                        reason=f"Date gap of {gap_days} day(s) is within the {grace}-day payment grace period.",
+                        evidence=ev,
+                        calculations=calcs_date,
+                    )
+                else:
+                    return AgentDecision(
+                        decision="HUMAN_REVIEW",
+                        confidence=0.85,
+                        reason_code="AMBIGUOUS_CANDIDATES",
+                        reason=f"Date gap of {gap_days} day(s) exceeds {grace}-day grace period. Manual date verification required.",
+                        evidence=ev,
+                        calculations=calcs_date,
+                    )
+            except Exception:
+                pass  # fall through to LLM
+
+    # --- TAX_MISMATCH: recompute tax with Decimal, never ask LLM ---
+    if exc.exception_type == "TAX_MISMATCH":
+        inv0_list = facts["invoices"][0] if facts["invoices"] else []
+        inv0 = inv0_list[0] if inv0_list else None
+        if inv0:
+            try:
+                from app.agents.tools import calculate_tax
+                tax_check = calculate_tax(
+                    money(inv0.get("total_amount", "0")) - money(inv0.get("tax_amount", "0")),
+                    money(inv0.get("tax_amount", "0")),
+                    money(inv0.get("total_amount", "0")),
+                )
+                # Fetch tax policy for rate validation
+                policy_hits = rag if rag else []
+                tax_policy = next((h for h in policy_hits if (h.get("payload") or {}).get("document_type") == "payment_policy"), None)
+                ev = [
+                    EvidenceItem(source="transaction", id=tx.id),
+                    EvidenceItem(source="invoice", id=exc.candidate_invoice_ids[0]) if exc.candidate_invoice_ids else EvidenceItem(source="transaction", id=tx.id),
+                ]
+                if tax_policy:
+                    ev.append(EvidenceItem(source="policy", id=(tax_policy.get("payload") or {}).get("document_id") or "TAX_POLICY_IN_18", section="applicable rate"))
+                calcs_tax = {
+                    "invoice_total": inv0.get("total_amount", "0"),
+                    "invoice_tax": inv0.get("tax_amount", "0"),
+                    "computed_total": tax_check["expected_total"],
+                    "is_internally_consistent": str(tax_check["consistent"]),
+                }
+                if tax_check["consistent"]:
+                    return AgentDecision(
+                        decision="AUTO_RESOLVE",
+                        confidence=0.91,
+                        reason_code="TAX_POLICY_MATCH",
+                        reason="Invoice tax arithmetic is internally consistent. Subtotal + tax = total within tolerance.",
+                        evidence=ev,
+                        calculations=calcs_tax,
+                    )
+                else:
+                    return AgentDecision(
+                        decision="HUMAN_REVIEW",
+                        confidence=0.88,
+                        reason_code="EXTRACTION_INCONSISTENT",
+                        reason=f"Tax arithmetic failed: stated total {tax_check['stated_total']} ≠ computed {tax_check['expected_total']}. Invoice may have rounding error or wrong tax rate.",
+                        evidence=ev,
+                        calculations=calcs_tax,
+                    )
+            except Exception:
+                pass  # fall through to LLM
+
     # Ambiguous / missing evidence: do not hallucinate
     if exc.exception_type in {"AMBIGUOUS_MATCH", "MISSING_INVOICE"} or len(exc.candidate_invoice_ids) > 1:
         evidence = [EvidenceItem(source="transaction", id=tx.id)]
