@@ -1,0 +1,5 @@
+Vendor Contract CONTRACT_VENDOR_AWS
+Party: Amazon Web Services
+Section 4.2 Settlement Variance: The payer may accept settlement differences up to 2.00% of the invoice total without amendment.
+Section 5 Tax: GST 18% unless reverse charge.
+Effective: 2026-01-01 Country: IN

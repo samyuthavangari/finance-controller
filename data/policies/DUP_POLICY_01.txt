@@ -1,0 +1,1 @@
+Duplicate payments with identical amount, currency, and payment reference must be escalated.

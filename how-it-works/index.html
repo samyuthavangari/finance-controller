@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>How finance AI control works</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="glow"></div>
+    <main>
+      <p class="kicker">Standalone explainer · not the live product</p>
+      <h1>Upload an invoice.<br /><em>Watch the controller work.</em></h1>
+      <p class="lede">
+        This page is a real-time walkthrough of the same rules as Vertex: SQL is truth, OCR vision reads scans, the LLM
+        only proposes, the gate posts or refuses. Open this file in a browser. It does not need the Python API.
+      </p>
+
+      <section class="panel drop" id="drop">
+        <input id="file" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp,.txt" />
+        <p class="drop-title">Drop an invoice here or click to choose</p>
+        <p class="muted">PDF, PNG, JPG. Digital PDF → native text. Scan/photo → OCR vision model.</p>
+        <div class="samples">
+          <button type="button" data-sample="digital">Sample: digital Tata PDF</button>
+          <button type="button" data-sample="scan">Sample: scanned photo</button>
+          <button type="button" data-sample="ambiguous">Sample: ambiguous amount</button>
+        </div>
+      </section>
+
+      <section class="meta" id="meta" hidden>
+        <span id="fname"></span>
+        <span id="kind"></span>
+      </section>
+
+      <ol class="pipe" id="pipe">
+        <li data-step="route">
+          <span class="n">1</span>
+          <div>
+            <strong>Router</strong>
+            <p>What kind of file is this?</p>
+          </div>
+          <span class="status">waiting</span>
+        </li>
+        <li data-step="extract">
+          <span class="n">2</span>
+          <div>
+            <strong>Extract</strong>
+            <p>Native text, or OCR vision model, or rare LLM vision.</p>
+          </div>
+          <span class="status">waiting</span>
+        </li>
+        <li data-step="validate">
+          <span class="n">3</span>
+          <div>
+            <strong>Python totals</strong>
+            <p>Line items + tax must equal invoice total.</p>
+          </div>
+          <span class="status">waiting</span>
+        </li>
+        <li data-step="sql">
+          <span class="n">4</span>
+          <div>
+            <strong>SQL truth</strong>
+            <p>Invoice lands in the ledger. Not in a chat.</p>
+          </div>
+          <span class="status">waiting</span>
+        </li>
+        <li data-step="match">
+          <span class="n">5</span>
+          <div>
+            <strong>L0 → L3 match</strong>
+            <p>Exact, alias, fuzzy, rank. Ranker cannot post.</p>
+          </div>
+          <span class="status">waiting</span>
+        </li>
+        <li data-step="llm">
+          <span class="n">6</span>
+          <div>
+            <strong>LLM (proposal only)</strong>
+            <p>Exceptions only. Duplicates skip this step.</p>
+          </div>
+          <span class="status">waiting</span>
+        </li>
+        <li data-step="gate">
+          <span class="n">7</span>
+          <div>
+            <strong>Decision gate</strong>
+            <p>Evidence IDs + Decimal math. Fake clauses die.</p>
+          </div>
+          <span class="status">waiting</span>
+        </li>
+      </ol>
+
+      <section class="verdict panel" id="verdict" hidden>
+        <p class="kicker" id="vtag"></p>
+        <h2 id="vtitle"></h2>
+        <p id="vbody"></p>
+        <pre id="vlog"></pre>
+      </section>
+
+      <p class="foot">
+        Live product: <code>http://localhost:5173/app</code> · Why this matters for AP/controllers:
+        <code>docs/HOW_CONTROL_IMPACTS_FINANCE.md</code>
+      </p>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>

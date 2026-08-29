@@ -1,0 +1,290 @@
+{
+  "seed": 42,
+  "records": 80,
+  "run_id": "RUN_7F3BF45DF4",
+  "job_id": "JOB_EBBBC76E3D",
+  "duration_ms": 8839,
+  "counters": {
+    "exact_matches": 53,
+    "ml_matches": 0,
+    "fuzzy_matches": 0,
+    "normalized_matches": 8,
+    "rag_resolved": 1,
+    "human_review": 0,
+    "unresolved": 18,
+    "failed_extraction": 0,
+    "invalid_financial_data": 0,
+    "exceptions": 19
+  },
+  "cost": {
+    "llm_calls": 0,
+    "rag_calls": 0,
+    "deterministic_pct": 0.775,
+    "ai_assisted_pct": 0.0,
+    "llm_calls_saved_pct": 1.0,
+    "avg_investigation_ms": 97.0,
+    "avg_llm_calls_per_exception": 0.0,
+    "avg_retrieval_latency_ms": 12,
+    "ocr_extraction_accuracy": null
+  },
+  "metrics": {
+    "records": 80,
+    "precision": 0.6774193548387096,
+    "recall": 0.9333333333333333,
+    "f1": 0.7850467289719625,
+    "match_accuracy": 0.7125,
+    "false_positive_rate": 0.25,
+    "false_negative_rate": 0.0375,
+    "auto_resolution_rate": 0.775,
+    "human_review_rate": 0.0,
+    "unresolved_rate": 0.225,
+    "extraction_error_rate": 0.0,
+    "exception_precision": 1.0,
+    "exception_recall": 0.48717948717948717,
+    "throughput_rps": 9.050797601538635,
+    "duration_ms": 8839,
+    "llm_calls": 0,
+    "rag_calls": 0,
+    "deterministic_pct": 0.775,
+    "ai_assisted_pct": 0.0,
+    "llm_calls_saved_pct": 1.0,
+    "ocr_extraction_accuracy": null,
+    "avg_investigation_ms": 97.0,
+    "avg_llm_calls_per_exception": 0.0,
+    "avg_retrieval_latency_ms": 12
+  },
+  "calibration": [
+    {
+      "bucket": "95-100",
+      "n": 61,
+      "accuracy": 0.6721311475409836
+    },
+    {
+      "bucket": "90-95",
+      "n": 0,
+      "accuracy": null
+    },
+    {
+      "bucket": "80-90",
+      "n": 1,
+      "accuracy": 1.0
+    },
+    {
+      "bucket": "70-80",
+      "n": 0,
+      "accuracy": null
+    },
+    {
+      "bucket": "<70",
+      "n": 18,
+      "accuracy": 0.8333333333333334
+    }
+  ],
+  "by_exception_type": {
+    "MATCH": {
+      "n": 41,
+      "accuracy": 1.0
+    },
+    "AMOUNT_MISMATCH": {
+      "n": 8,
+      "accuracy": 0.625
+    },
+    "DATE_MISMATCH": {
+      "n": 4,
+      "accuracy": 0.0
+    },
+    "MISSING_INVOICE": {
+      "n": 4,
+      "accuracy": 0.0
+    },
+    "PARTIAL_PAYMENT": {
+      "n": 4,
+      "accuracy": 1.0
+    },
+    "CURRENCY_MISMATCH": {
+      "n": 4,
+      "accuracy": 1.0
+    },
+    "TAX_MISMATCH": {
+      "n": 4,
+      "accuracy": 0.0
+    },
+    "AMBIGUOUS_MATCH": {
+      "n": 4,
+      "accuracy": 0.0
+    },
+    "VENDOR_MISMATCH": {
+      "n": 4,
+      "accuracy": 0.0
+    },
+    "DUPLICATE_PAYMENT": {
+      "n": 3,
+      "accuracy": 1.0
+    }
+  },
+  "worked_auto_resolve": {
+    "transaction_id": "TX_0022",
+    "vendor": "Tata Communications",
+    "amount": "697217.48",
+    "decision": "AUTO_RESOLVE",
+    "reason_code": "CONTRACTUAL_VARIANCE",
+    "reason": "Settlement variance is within contractual / vendor master tolerance.",
+    "confidence": 0.88,
+    "authorized": true,
+    "gate_notes": "gate applied",
+    "evidence": [
+      {
+        "source": "invoice",
+        "id": "INV_0022",
+        "page": null,
+        "section": null,
+        "snippet": null
+      },
+      {
+        "source": "transaction",
+        "id": "TX_0022",
+        "page": null,
+        "section": null,
+        "snippet": null
+      },
+      {
+        "source": "vendor",
+        "id": "VENDOR_TATA",
+        "page": null,
+        "section": null,
+        "snippet": "allowed_variance_pct=2.00"
+      },
+      {
+        "source": "policy",
+        "id": "SETTLEMENT_POLICY_02",
+        "page": null,
+        "section": "auto-resolve variance",
+        "snippet": null
+      }
+    ],
+    "calculations": {
+      "invoice_amount": "688950.08",
+      "settlement_amount": "697217.48",
+      "difference": "8267.40",
+      "variance_percentage": "1.20",
+      "allowed_variance_percentage": "2.00"
+    }
+  },
+  "worked_human_review": null,
+  "gate_rejected_hallucination": {
+    "event": "GATE_REJECTED_HALLUCINATION",
+    "detail": "unknown evidence contract:CONTRACT_HALLUCINATED_99; difference does not match invoice vs settlement",
+    "extra": {
+      "proposed_decision": "AUTO_RESOLVE",
+      "gated_decision": "HUMAN_REVIEW",
+      "authorized": false,
+      "invented_evidence": "contract:CONTRACT_HALLUCINATED_99"
+    }
+  },
+  "exception_sample": [
+    {
+      "id": "EX_BA60A75D46",
+      "transaction_id": "TX_0002",
+      "type": "AMBIGUOUS_MATCH",
+      "amount": "638759.77",
+      "decision": "UNRESOLVED",
+      "reason": "Possible invoices: INV-0002 INV-0010. Similar vendor/amount/date. Evidence: Insufficient.",
+      "candidates": [
+        "INV_0002",
+        "INV_0010",
+        "INV_0018"
+      ]
+    },
+    {
+      "id": "EX_FD3912C62B",
+      "transaction_id": "TX_0003",
+      "type": "AMBIGUOUS_MATCH",
+      "amount": "41830.91",
+      "decision": "UNRESOLVED",
+      "reason": "Possible invoices: INV-0003 INV-0011. Similar vendor/amount/date. Evidence: Insufficient.",
+      "candidates": [
+        "INV_0003",
+        "INV_0011",
+        "INV_0019"
+      ]
+    },
+    {
+      "id": "EX_9620C7AC56",
+      "transaction_id": "TX_0007",
+      "type": "AMBIGUOUS_MATCH",
+      "amount": "139327.32",
+      "decision": "UNRESOLVED",
+      "reason": "Possible invoices: INV-0007 INV-0015. Similar vendor/amount/date. Evidence: Insufficient.",
+      "candidates": [
+        "INV_0007",
+        "INV_0015",
+        "INV_0023"
+      ]
+    },
+    {
+      "id": "EX_9D9F6365AC",
+      "transaction_id": "TX_0008",
+      "type": "AMBIGUOUS_MATCH",
+      "amount": "735009.02",
+      "decision": "UNRESOLVED",
+      "reason": "Possible invoices: INV-0008 INV-0016. Similar vendor/amount/date. Evidence: Insufficient.",
+      "candidates": [
+        "INV_0008",
+        "INV_0016",
+        "INV_0024"
+      ]
+    },
+    {
+      "id": "EX_1CDE859BC6",
+      "transaction_id": "TX_0022",
+      "type": "AMOUNT_MISMATCH",
+      "amount": "697217.48",
+      "decision": "AUTO_RESOLVE",
+      "reason": "Amount differs from invoice INV-0022.",
+      "candidates": [
+        "INV_0022",
+        "INV_0006",
+        "INV_0014"
+      ]
+    },
+    {
+      "id": "EX_11DAC46551",
+      "transaction_id": "TX_0023",
+      "type": "AMBIGUOUS_MATCH",
+      "amount": "846425.89",
+      "decision": "UNRESOLVED",
+      "reason": "Possible invoices: INV-0023 INV-0007. Similar vendor/amount/date. Evidence: Insufficient.",
+      "candidates": [
+        "INV_0023",
+        "INV_0007",
+        "INV_0015"
+      ]
+    },
+    {
+      "id": "EX_4B29777AB8",
+      "transaction_id": "TX_0026",
+      "type": "AMBIGUOUS_MATCH",
+      "amount": "243822.22",
+      "decision": "UNRESOLVED",
+      "reason": "Possible invoices: INV-0002 INV-0010. Similar vendor/amount/date. Evidence: Insufficient.",
+      "candidates": [
+        "INV_0002",
+        "INV_0010",
+        "INV_0018"
+      ]
+    },
+    {
+      "id": "EX_4C42784C57",
+      "transaction_id": "TX_0027",
+      "type": "AMBIGUOUS_MATCH",
+      "amount": "412046.56",
+      "decision": "UNRESOLVED",
+      "reason": "Possible invoices: INV-0027 INV-0003. Similar vendor/amount/date. Evidence: Insufficient.",
+      "candidates": [
+        "INV_0027",
+        "INV_0003",
+        "INV_0011"
+      ]
+    }
+  ]
+}

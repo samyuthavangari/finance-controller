@@ -1,0 +1,1 @@
+Settlement Policy 02: Auto-resolve settlement variance only when contract permits and variance is within contractual percentage. Otherwise HUMAN_REVIEW. Never invent a match.

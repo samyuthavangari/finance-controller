@@ -1,0 +1,67 @@
+match_thresholds:
+  auto_match: 0.98
+  investigate: 0.85
+  ambiguous: 0.60
+
+tolerances:
+  amount: "0.01"
+  amount_pct: "0.002"
+  contractual_variance_pct: "0.02"
+  tax: "0.50"
+  date_days: 3
+
+extraction:
+  min_text_chars: 40
+  ocr_confidence_floor: 0.55
+  vision_fallback_confidence: 0.40
+  amount_line_item_tolerance: "0.50"
+
+uploads:
+  max_bytes: 26214400
+  allowed_mime:
+    - application/pdf
+    - application/json
+    - text/csv
+    - text/plain
+    - image/png
+    - image/jpeg
+    - image/webp
+    - video/mp4
+  allowed_ext:
+    - .pdf
+    - .json
+    - .csv
+    - .txt
+    - .png
+    - .jpg
+    - .jpeg
+    - .webp
+    - .mp4
+
+decision_gate:
+  min_confidence_auto_resolve: 0.85
+  require_evidence: true
+  allowed_reason_codes:
+    - EXACT_MATCH
+    - NORMALIZED_MATCH
+    - FUZZY_MATCH
+    - ML_MATCH
+    - CONTRACTUAL_VARIANCE
+    - TAX_POLICY_MATCH
+    - VENDOR_ALIAS
+    - DUPLICATE_DETECTED
+    - PARTIAL_PAYMENT
+    - SPLIT_PAYMENT
+    - INSUFFICIENT_EVIDENCE
+    - EXTRACTION_INCONSISTENT
+    - AMBIGUOUS_CANDIDATES
+    - HUMAN_OVERRIDE
+    - UNMATCHED
+
+cash:
+  current_cash: "25000000.00"
+  currency: INR
+  scheduled_monthly_expenses: "4200000.00"
+
+cost:
+  skip_llm_below_investigate: true
