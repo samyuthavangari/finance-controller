@@ -1,6 +1,6 @@
 # AI Finance Controller
 
-Razorpay Buildathon **Track 04 — Run the books and the cash position.**
+**Run the books and the cash position.**
 
 **Postgres/SQLite = truth. Qdrant = evidence. LLM = proposal. Decision gate = authority.**
 
@@ -86,7 +86,7 @@ cp .env.example .env
 docker compose up --build
 ```
 
-- UI landing (Razorpay Vertex): http://localhost:5173  
+- UI landing (Vertex): http://localhost:5173  
 - Control center: http://localhost:5173/app  
 - Settlement agent: http://localhost:5173/app/settlement  
 - API: http://localhost:8000/api/docs  

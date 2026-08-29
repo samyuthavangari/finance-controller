@@ -18,7 +18,6 @@ export default function Landing() {
             <div className="mark">V</div>
             <div>
               <div className="text-sm font-medium tracking-tight">Vertex</div>
-              <div className="text-[10px] uppercase tracking-[0.22em] text-muted">Track 04</div>
             </div>
           </a>
           <nav className="hidden items-center gap-8 text-sm text-muted md:flex">
@@ -51,7 +50,7 @@ export default function Landing() {
             <RazorpayName size="hero" />
           </div>
         </div>
-        <p className="mt-3 text-xs text-muted">Click Razorpay once — lights come on slowly, letter by letter. Click again to fade them off.</p>
+        <p className="mt-3 text-xs text-muted">Click the logo once — lights come on slowly, letter by letter. Click again to fade them off.</p>
       </section>
 
       <section className="mx-auto grid max-w-6xl items-center gap-14 px-6 pb-20 lg:grid-cols-[1.05fr_0.95fr]">
@@ -183,7 +182,7 @@ export default function Landing() {
 
       <footer className="border-t border-line px-6 py-10">
         <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-4 text-sm text-muted md:flex-row md:items-center">
-          <span>Vertex · Buildathon Track 04</span>
+          <span>Vertex</span>
           <Link to="/app" className="text-fg hover:opacity-80">
             Open the control system →
           </Link>

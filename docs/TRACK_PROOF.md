@@ -7,7 +7,7 @@ Reproduce: `python scripts/prove_track.py 80` or UI **RUN DEMO**. Seed **42**. H
 
 ---
 
-## Headline (Track 04 bar)
+## Headline
 
 | Metric | Value |
 |---|---|
@@ -127,7 +127,7 @@ Duplicates skip Gemini: same amount + currency + payment reference is a **key**,
 
 - **Trained on:** synthetic pair features from `scripts/generate_dataset.py` (seed 42): vendor similarity, amount difference and %, date distance, invoice-ref similarity, currency match, bank-ref similarity, historical vendor match rate. Labels come from the **generator**, not from production banks.
 - **Not trained on:** hidden `ground_truth` rows at **inference** time — those are eval-only.
-- **Generalization:** we **do not** claim this booster transfers to live Razorpay traffic. It can overfit generator quirks. That is why L3 **cannot write the ledger**; `policy.yaml` plus the gate still decide. On the 200-record demo, L3 auto-matches = **0**. If `match_model.txt` is missing, a linear heuristic with the same features is used.
+- **Generalization:** we **do not** claim this booster transfers to live traffic. It can overfit generator quirks. That is why L3 **cannot write the ledger**; `policy.yaml` plus the gate still decide. On the 200-record demo, L3 auto-matches = **0**. If `match_model.txt` is missing, a linear heuristic with the same features is used.
 
 ---
 
