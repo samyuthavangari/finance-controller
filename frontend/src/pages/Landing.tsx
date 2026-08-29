@@ -1,15 +1,36 @@
 import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { RazorpayName } from "../components/RazorpayName";
 import { ThemeToggle } from "../components/ThemeToggle";
-
-const PARTITION = [
-  { n: 131, label: "L0 exact", className: "bg-accent" },
-  { n: 20, label: "L1 alias", className: "bg-sky-400" },
-  { n: 3, label: "Gate resolve", className: "bg-indigo-400" },
-  { n: 46, label: "Unresolved", className: "bg-rose-400" },
-];
+import { api } from "../services/api";
 
 export default function Landing() {
+  const { data: metrics } = useQuery({ queryKey: ["metrics"], queryFn: api.metrics });
+  const m = metrics?.benchmark;
+  const counters = metrics?.run?.counters || {};
+
+  const exact = Number(counters.exact_matches || 0) + Number(counters.normalized_matches || 0)
+    + Number(counters.fuzzy_matches || 0) + Number(counters.ml_matches || 0);
+  const gateResolved = Number(counters.rag_resolved || 0);
+  const humanReview = Number(counters.human_review || 0);
+  const unresolved = Number(counters.unresolved || 0);
+  const total = exact + gateResolved + humanReview + unresolved || 200;
+
+  const partition = m ? [
+    { n: exact, label: "L0/L1 exact", className: "bg-accent" },
+    { n: gateResolved, label: "Gate resolve", className: "bg-indigo-400" },
+    { n: humanReview, label: "Review", className: "bg-warn" },
+    { n: unresolved, label: "Unresolved", className: "bg-rose-400" },
+  ] : [
+    { n: 131, label: "L0 exact", className: "bg-accent" },
+    { n: 20, label: "L1 alias", className: "bg-sky-400" },
+    { n: 3, label: "Gate resolve", className: "bg-indigo-400" },
+    { n: 46, label: "Unresolved", className: "bg-rose-400" },
+  ];
+  const f1Pct = m ? `${(m.f1 * 100).toFixed(1)}%` : "78.5%";
+  const authorized = m ? exact + gateResolved : 154;
+  const exceptions = m ? unresolved : 46;
+  const llmCalls = metrics?.cost?.llm_calls ?? 0;
   return (
     <div className="min-h-screen hero-glow grain text-fg">
       <header className="glass sticky top-0 z-20">
@@ -77,17 +98,17 @@ export default function Landing() {
           </p>
         </div>
 
-        <ProductFrame />
+        <ProductFrame partition={partition} total={total} f1={f1Pct} />
       </section>
 
       <Workflow />
 
       <section id="proof" className="border-y border-line">
         <div className="mx-auto grid max-w-6xl grid-cols-2 divide-y divide-[color:var(--line)] md:grid-cols-4 md:divide-x md:divide-y-0">
-          <Stat n="78.5%" l="F1 vs hidden ground truth" />
-          <Stat n="154" l="Authorized matches" />
-          <Stat n="46" l="Honest exceptions" />
-          <Stat n="0" l="LLM calls on this close" />
+          <Stat n={f1Pct} l="F1 vs hidden ground truth" />
+          <Stat n={String(authorized)} l="Authorized matches" />
+          <Stat n={String(exceptions)} l="Honest exceptions" />
+          <Stat n={String(llmCalls)} l="LLM calls on this close" />
         </div>
       </section>
 
@@ -269,8 +290,7 @@ function Engine({ k, title, model, body }: { k: string; title: string; model: st
   );
 }
 
-function ProductFrame() {
-  const total = 200;
+function ProductFrame({ partition, total, f1 }: { partition: { n: number; label: string; className: string }[]; total: number; f1: string }) {
   return (
     <div className="relative">
       <div className="absolute -inset-8 rounded-[32px] bg-accent/5 blur-3xl" />
@@ -284,14 +304,18 @@ function ProductFrame() {
         </div>
         <div className="p-5">
           <div className="text-[11px] uppercase tracking-[0.16em] text-muted">Match F1</div>
-          <div className="display mt-1 text-5xl">78.5%</div>
+          <div className="display mt-1 text-5xl">{f1}</div>
           <div className="mt-5 flex h-1.5 overflow-hidden rounded-full bg-[color:var(--line)]">
-            {PARTITION.map((p) => (
-              <div key={p.label} className={p.className} style={{ width: `${(p.n / total) * 100}%` }} />
+            {partition.map((p) => (
+              <div
+                key={p.label}
+                className={`${p.className} transition-all duration-700`}
+                style={{ width: `${(p.n / total) * 100}%` }}
+              />
             ))}
           </div>
           <div className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1 text-[11px] text-muted">
-            {PARTITION.map((p) => (
+            {partition.map((p) => (
               <div key={p.label}>
                 <span className="mono text-fg">{p.n}</span> {p.label}
               </div>

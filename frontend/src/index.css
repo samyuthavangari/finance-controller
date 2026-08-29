@@ -19,8 +19,8 @@ html.dark {
   --btn: #ededed;
   --btn-fg: #000000;
   --cursor: #ededed;
-  --glow-a: transparent;
-  --glow-b: transparent;
+  --glow-a: rgba(0, 229, 168, 0.12);
+  --glow-b: rgba(99, 102, 241, 0.08);
 }
 
 html.light {
@@ -39,8 +39,8 @@ html.light {
   --btn: #171717;
   --btn-fg: #ffffff;
   --cursor: #171717;
-  --glow-a: transparent;
-  --glow-b: transparent;
+  --glow-a: rgba(0, 112, 243, 0.08);
+  --glow-b: rgba(99, 102, 241, 0.05);
 }
 
 * {
@@ -66,10 +66,16 @@ body {
 .hero-glow {
   position: relative;
   background: #000000;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 20% 0%, var(--glow-a), transparent),
+    radial-gradient(ellipse 60% 40% at 80% 10%, var(--glow-b), transparent);
 }
 
 html.light .hero-glow {
   background: #ffffff;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 20% 0%, var(--glow-a), transparent),
+    radial-gradient(ellipse 60% 40% at 80% 10%, var(--glow-b), transparent);
 }
 
 .glass,
