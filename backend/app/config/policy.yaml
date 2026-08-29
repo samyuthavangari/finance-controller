@@ -8,7 +8,7 @@ tolerances:
   amount_pct: "0.002"
   contractual_variance_pct: "0.02"
   tax: "0.50"
-  date_days: 3
+  date_days: 2
 
 extraction:
   min_text_chars: 40
@@ -39,7 +39,7 @@ uploads:
     - .mp4
 
 decision_gate:
-  min_confidence_auto_resolve: 0.85
+  min_confidence_auto_resolve: 0.87
   require_evidence: true
   allowed_reason_codes:
     - EXACT_MATCH

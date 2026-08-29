@@ -78,16 +78,23 @@ def score_pair(tx: Transaction, inv: Invoice, vendor: Vendor | None, hist_rate: 
         return Candidate(inv, 0.999, "L0", features, checks)
     if checks["payment_reference"] and checks["exact_amount"] and checks["exact_currency"]:
         return Candidate(inv, 0.995, "L0", features, checks)
-    if checks["vendor"] and checks["exact_amount"] and checks["exact_currency"] and checks["date_within_tolerance"]:
+    # L1: vendor + exact amount + currency + date AND at least one reference signal
+    # to prevent same-vendor/same-amount collisions from false-matching
+    ref_signal = checks["invoice_id"] or checks["payment_reference"] or features["invoice_reference_similarity"] >= 0.7
+    if checks["vendor"] and checks["exact_amount"] and checks["exact_currency"] and checks["date_within_tolerance"] and ref_signal:
         return Candidate(inv, 0.985, "L1", features, checks)
+    # L1 without reference: demote to 0.965 so gate can separate from ambiguous
+    if checks["vendor"] and checks["exact_amount"] and checks["exact_currency"] and checks["date_within_tolerance"]:
+        return Candidate(inv, 0.965, "L1", features, checks)
 
+    # L2: tighter amount tolerance (2% not 5%) and higher fuzzy floor (0.94)
     fuzzy = (
         0.35 * features["vendor_similarity"]
-        + 0.30 * (1 - min(1.0, features["amount_difference_percentage"] / 0.05))
+        + 0.30 * (1 - min(1.0, features["amount_difference_percentage"] / 0.02))
         + 0.20 * features["invoice_reference_similarity"]
         + 0.15 * (1 - min(1.0, features["date_difference"] / 14))
     )
-    if fuzzy >= 0.92 and features["currency_match"] == 1.0:
+    if fuzzy >= 0.94 and features["currency_match"] == 1.0:
         return Candidate(inv, min(0.97, fuzzy), "L2", features, checks)
 
     ml = get_matching_model().predict_proba(features)
@@ -139,4 +146,17 @@ def match_transaction(
         vendor = vendors.get(inv.vendor_id) if inv.vendor_id else vendors.get(tx.vendor_id)
         scored.append(score_pair(tx, inv, vendor, hist))
     scored.sort(key=lambda c: c.score, reverse=True)
+    # Ambiguity guard: if top-2 are both above investigate threshold and
+    # separated by less than 0.02, demote top to the ambiguous band
+    # so the exception handler catches it rather than auto-matching.
+    if len(scored) >= 2:
+        gap = scored[0].score - scored[1].score
+        if scored[0].score >= 0.94 and scored[1].score >= 0.80 and gap < 0.02:
+            scored[0] = Candidate(
+                scored[0].invoice,
+                min(scored[0].score, 0.84),  # push below auto_match (0.98) & investigate (0.85)
+                scored[0].level + "*",
+                scored[0].features,
+                scored[0].checks,
+            )
     return scored[:5]
