@@ -46,7 +46,6 @@ function Shell() {
       <aside className="glass flex w-[232px] shrink-0 flex-col border-r px-4 py-5">
         <NavLink to="/" className="mb-8 flex items-center gap-3 px-2">
           <div className="mark">V</div>
-          <RazorpayName />
         </NavLink>
         <nav className="flex flex-1 flex-col gap-0.5 text-[13px]">
           {links.map(([to, label, Icon]) => (

@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { RazorpayName } from "../components/RazorpayName";
 import { ThemeToggle } from "../components/ThemeToggle";
 import { api } from "../services/api";
 
@@ -63,7 +64,15 @@ export default function Landing() {
         </div>
       </header>
 
-
+      <section id="top" className="mx-auto max-w-6xl px-6 pb-12 pt-14">
+        <p className="text-[11px] uppercase tracking-[0.28em] text-muted">AI finance controller</p>
+        <div className="mt-6 overflow-x-auto pb-2">
+          <div className="rzp-stage">
+            <RazorpayName size="hero" />
+          </div>
+        </div>
+        <p className="mt-3 text-xs text-muted">Click the logo once — lights come on slowly, letter by letter. Click again to fade them off.</p>
+      </section>
 
       <section className="mx-auto grid max-w-6xl items-center gap-14 px-6 pb-20 lg:grid-cols-[1.05fr_0.95fr]">
         <div>
