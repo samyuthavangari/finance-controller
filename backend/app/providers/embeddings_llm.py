@@ -4,11 +4,11 @@ from app.config.settings import settings
 from app.providers.base import EmbeddingProvider
 
 
-class GeminiEmbeddingProvider(EmbeddingProvider):
+class LLMEmbeddingProvider(EmbeddingProvider):
     def __init__(self) -> None:
         self._client = None
-        if settings.gemini_api_key:
-            self._client = genai.Client(api_key=settings.gemini_api_key)
+        if settings.llm_api_key:
+            self._client = genai.Client(api_key=settings.llm_api_key)
 
     def embed(self, texts: list[str]) -> list[list[float]]:
         if not self._client:

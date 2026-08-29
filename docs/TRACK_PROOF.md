@@ -3,7 +3,7 @@
 Source of the **200-record** counts: live `POST /api/demo/run` on 2026-08-27 (uvicorn log: 200 OK).  
 Worked-example IDs below were re-read from the same SQLite controller DB (`data/synthetic/dev.db`) after that session. **Not typed from memory.**
 
-Reproduce: `python scripts/prove_track.py 80` or UI **RUN DEMO**. Seed **42**. Hidden ground truth is never passed to Gemini.
+Reproduce: `python scripts/prove_track.py 80` or UI **RUN DEMO**. Seed **42**. Hidden ground truth is never passed to LLM.
 
 ---
 
@@ -51,7 +51,7 @@ Exceptions opened: **49** = 46 unresolved + 3 auto-resolved. Nothing left in lim
 | Python calc | difference **₹8,267.40** · variance **1.20%** |
 | Cap | vendor `VENDOR_TATA` `allowed_variance_pct=2.00` + policy `SETTLEMENT_POLICY_02` |
 | Matcher | Not L0 (amount not exact) → investigation |
-| Tools | `search_invoice`, `search_vendor`, `calculate_variance` — **no Gemini** |
+| Tools | `search_invoice`, `search_vendor`, `calculate_variance` — **no LLM** |
 | Gate | Evidence IDs exist; Decimal recompute of 1.20% matches claimed calc |
 | Verdict | **AUTO_RESOLVE** · `CONTRACTUAL_VARIANCE` · `authorized: true` |
 
@@ -75,7 +75,7 @@ Same pattern: **TX_0003** (INV-0003 vs INV-0011), **TX_0007** (INV-0007 vs INV-0
 
 Audit event **`GATE_REJECTED_HALLUCINATION`** on the same run.
 
-A payload equivalent to Gemini inventing a close:
+A payload equivalent to LLM inventing a close:
 
 - Proposed: `AUTO_RESOLVE` confidence 0.99  
 - Invented evidence: `contract:CONTRACT_HALLUCINATED_99`  
@@ -117,9 +117,9 @@ flowchart TD
   eval --> cash --> ui
 ```
 
-SQL = truth. Qdrant = contracts/policies/history. Gemini = proposal only. Gate = authority.
+SQL = truth. Qdrant = contracts/policies/history. LLM = proposal only. Gate = authority.
 
-Duplicates skip Gemini: same amount + currency + payment reference is a **key**, not a contract question (`DUPLICATE_SKIPPED_LLM`).
+Duplicates skip LLM: same amount + currency + payment reference is a **key**, not a contract question (`DUPLICATE_SKIPPED_LLM`).
 
 ---
 

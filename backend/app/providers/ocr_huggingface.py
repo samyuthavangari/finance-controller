@@ -7,7 +7,7 @@ from app.providers.base import OCRProvider
 
 
 class HuggingFaceOCRProvider(OCRProvider):
-    """Baidu PaddleOCR-VL (or other HF document model) via Inference API."""
+    """Provider OCR Vision Model (or other HF document model) via Inference API."""
 
     def ocr(self, image_bytes: bytes, mime: str = "image/png") -> dict[str, Any]:
         if not settings.hf_token:

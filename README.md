@@ -29,7 +29,7 @@ We do not claim 100%. Matcher confidence ≠ authorized match.
 
 ### Worked A — authorized: TX_0022
 
-Tata Communications settlement **₹697,217.48** vs invoice **INV_0022 ₹688,950.08**. Python variance **1.20%** vs vendor cap **2.00%**. Evidence: `INV_0022`, `TX_0022`, `VENDOR_TATA`, `SETTLEMENT_POLICY_02`. Gate recomputed Decimal math. Verdict **AUTO_RESOLVE** / `CONTRACTUAL_VARIANCE` / `authorized: true`. Gemini not used. Also **TX_0082** (Microsoft, 1.20% vs 1.50% cap).
+Tata Communications settlement **₹697,217.48** vs invoice **INV_0022 ₹688,950.08**. Python variance **1.20%** vs vendor cap **2.00%**. Evidence: `INV_0022`, `TX_0022`, `VENDOR_TATA`, `SETTLEMENT_POLICY_02`. Gate recomputed Decimal math. Verdict **AUTO_RESOLVE** / `CONTRACTUAL_VARIANCE` / `authorized: true`. LLM not used. Also **TX_0082** (Microsoft, 1.20% vs 1.50% cap).
 
 ### Worked B — refused: TX_0002 / EX_72DB2E48ED
 
@@ -71,11 +71,11 @@ flowchart TD
   eval --> cash --> ui
 ```
 
-Duplicates skip Gemini (structural key: amount + currency + reference).
+Duplicates skip LLM (structural key: amount + currency + reference).
 
 **L3 LightGBM:** trained on seed-42 synthetic pair features (vendor/amount/date/ref/currency); labels from the generator. Hidden GT is eval-only. We do not claim live-bank generalization. L3 cannot post the ledger — this demo: **0** L3 auto-matches.
 
-If Gemini or OCR is down, L0/L1 still close books (this run: 0 LLM calls).
+If LLM or OCR is down, L0/L1 still close books (this run: 0 LLM calls).
 
 ---
 

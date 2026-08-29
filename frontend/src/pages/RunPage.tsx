@@ -31,7 +31,7 @@ export default function RunPage() {
       <PageHeader
         kicker="Close"
         title="Reconciliation"
-        subtitle="Deterministic first. Only exceptions reach Gemini."
+        subtitle="Deterministic first. Only exceptions reach LLM."
       />
       <div className="flex flex-wrap items-center gap-3">
         <input ref={input} type="file" className="text-sm text-muted" onChange={(e) => e.target.files?.[0] && api.upload(e.target.files[0])} />

@@ -1,4 +1,4 @@
-"""Settlement Q&A: answers over closed-book SQL facts. Gemini proposes; tools and Decimal are truth."""
+"""Settlement Q&A: answers over closed-book SQL facts. LLM proposes; tools and Decimal are truth."""
 
 from __future__ import annotations
 
@@ -139,7 +139,7 @@ def _deterministic_answer(q: str, facts: dict) -> dict | None:
             "calculations": calc,
             "authorized": True,
             "used_llm": False,
-            "gate_notes": "answered from stored decision + SQL facts; Gemini not required",
+            "gate_notes": "answered from stored decision + SQL facts; LLM not required",
         }
     if exc and ("unresolved" in ql or "exception" in ql or "not match" in ql or "ambiguous" in ql or "tx_" in ql) and not dec:
         return {

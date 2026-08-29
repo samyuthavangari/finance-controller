@@ -12,12 +12,12 @@ Think of it like this:
 
 **SQL** = the real numbers (truth).  
 **Qdrant** = contract / policy text (evidence, not cash).  
-**Gemini** = a helper that can *suggest* an answer.  
-**The gate** = the adult in the room. It checks IDs and math. Gemini cannot write the books.
+**LLM** = a helper that can *suggest* an answer.  
+**The gate** = the adult in the room. It checks IDs and math. LLM cannot write the books.
 
 ---
 
-## Can I upload a PDF? Will PaddleOCR read it?
+## Can I upload a PDF? Will OCR Vision Model read it?
 
 **Yes, you can upload a PDF** on **Close books** (file picker).  
 Allowed types (max **25 MB**):
@@ -33,14 +33,14 @@ Allowed types (max **25 MB**):
 
 1. **Digital PDF** (you can select text with the mouse)  
    Best. The system reads the text with `pdfplumber` / `pypdf`.  
-   **PaddleOCR is not used.** Faster and more accurate.
+   **OCR Vision Model is not used.** Faster and more accurate.
 
 2. **Scanned PDF** (it looks like a photo of paper; you cannot select text)  
-   If there are fewer than **40 characters** of real text, it calls **Hugging Face PaddleOCR-VL** (`PaddlePaddle/PaddleOCR-VL`).  
+   If there are fewer than **40 characters** of real text, it calls **AI Provider OCR Vision Model** (`ocr-model-v1`).  
    That is the “read the pixels” step. Needs `HF_TOKEN` in `.env`.
 
 3. **Still unreadable after OCR**  
-   Last resort: **Gemini vision**. Python still checks that line items + tax add up.
+   Last resort: **LLM vision**. Python still checks that line items + tax add up.
 
 **Good PDFs**
 
@@ -141,7 +141,7 @@ Answers use SQL + Decimal. **This chat cannot approve a match.**
 **What:** “How much money will we have?” for 7 / 14 / 30 days.
 
 Example buttons: delay receivables 7 days, delay settlement 5 days, expenses +10%, collect ₹5L early.  
-Math is a formula. **Not** Qdrant. **Not** Gemini inventing a balance.
+Math is a formula. **Not** Qdrant. **Not** LLM inventing a balance.
 
 ---
 
@@ -182,7 +182,7 @@ Example event: **GATE_REJECTED_HALLUCINATION** — someone proposed a fake contr
    - **L2** fuzzy text score  
    - **L3** LightGBM **ranks** pairs only; it cannot post the ledger  
    - Hard leftovers become **exceptions**  
-6. For some exceptions, Python checks **contract variance** (TX_0022: 1.20% vs 2% cap) → **AUTO_RESOLVE** without Gemini.  
+6. For some exceptions, Python checks **contract variance** (TX_0022: 1.20% vs 2% cap) → **AUTO_RESOLVE** without LLM.  
 7. Ambiguous ones stay **UNRESOLVED**.  
 8. Eval compares decisions to hidden truth → **F1**, etc.  
 9. Cash forecast is computed from the ledger.  
@@ -203,10 +203,10 @@ LLM calls = 0
 | Tool | When | Kid version |
 |---|---|---|
 | Native PDF text | You can highlight text in the PDF | “Copy the words, don’t photograph them” |
-| **PaddleOCR** | Scan / image / empty PDF | “Read the picture of the page” |
-| Gemini vision | OCR still junk | “Look with a smarter camera, still don’t invent ₹” |
+| **OCR Vision Model** | Scan / image / empty PDF | “Read the picture of the page” |
+| LLM vision | OCR still junk | “Look with a smarter camera, still don’t invent ₹” |
 | Qdrant | Exception needs a clause | “Find the contract paragraph” |
-| Gemini JSON | Messy exception, not a duplicate | “Suggest a decision” |
+| LLM JSON | Messy exception, not a duplicate | “Suggest a decision” |
 | Gate | Always before posting | “Show your homework. Wrong ID or wrong math = no.” |
 
 ---
@@ -216,16 +216,16 @@ LLM calls = 0
 **Window 1 — API**
 
 ```powershell
-cd "C:\Users\RAHUL\Postman Agent\finance-controller\backend"
-$env:PYTHONPATH="C:\Users\RAHUL\Postman Agent\finance-controller\backend"
-$env:DATABASE_URL="sqlite:///C:/Users/RAHUL/Postman Agent/finance-controller/data/synthetic/dev.db"
+cd "C:\Users\samyutha\Postman Agent\finance-controller\backend"
+$env:PYTHONPATH="C:\Users\samyutha\Postman Agent\finance-controller\backend"
+$env:DATABASE_URL="sqlite:///C:/Users/samyutha/Postman Agent/finance-controller/data/synthetic/dev.db"
 python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
 ```
 
 **Window 2 — UI**
 
 ```powershell
-cd "C:\Users\RAHUL\Postman Agent\finance-controller\frontend"
+cd "C:\Users\samyutha\Postman Agent\finance-controller\frontend"
 npm run dev -- --port 5173
 ```
 

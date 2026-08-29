@@ -76,7 +76,7 @@ def investigate(db: Session, run_id: str, exc: ExceptionRecord, tx: Transaction,
     _log(db, inv_row.id, "search_transactions", {"id": tx.id}, facts["transaction"])
 
     # Duplicates are a structural finding (same amount + currency + payment_reference).
-    # There is nothing semantic to investigate — Gemini is reserved for judgment, not classification.
+    # There is nothing semantic to investigate — LLM is reserved for judgment, not classification.
     if facts.get("duplicates"):
         proposed = AgentDecision(
             decision="HUMAN_REVIEW",

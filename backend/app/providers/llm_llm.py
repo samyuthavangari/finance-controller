@@ -5,15 +5,15 @@ from app.config.settings import settings
 from app.providers.base import LLMProvider
 
 
-class GeminiLLMProvider(LLMProvider):
+class LLMLLMProvider(LLMProvider):
     def __init__(self) -> None:
         self._client = None
-        if settings.gemini_api_key:
-            self._client = genai.Client(api_key=settings.gemini_api_key)
+        if settings.llm_api_key:
+            self._client = genai.Client(api_key=settings.llm_api_key)
 
     def _ensure(self):
         if not self._client:
-            raise RuntimeError("GEMINI_API_KEY is not configured")
+            raise RuntimeError("LLM_API_KEY is not configured")
         return self._client
 
     def generate(self, prompt: str, system: str | None = None, json_mode: bool = False) -> str:

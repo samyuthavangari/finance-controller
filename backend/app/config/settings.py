@@ -25,16 +25,16 @@ class Settings(BaseSettings):
     api_auth_token: str = "demo-token"
     auth_enabled: bool = True
 
-    llm_provider: str = "gemini"
-    llm_model: str = "gemini-2.5-flash"
-    llm_vision_model: str = "gemini-2.5-flash"
-    gemini_api_key: str = ""
+    llm_provider: str = "llm"
+    llm_model: str = "llm-2.5-flash"
+    llm_vision_model: str = "llm-2.5-flash"
+    llm_api_key: str = ""
 
-    embedding_provider: str = "gemini"
+    embedding_provider: str = "llm"
     embedding_model: str = "text-embedding-004"
 
     ocr_provider: str = "huggingface"
-    ocr_model: str = "PaddlePaddle/PaddleOCR-VL"
+    ocr_model: str = "ocr-model-v1"
     hf_token: str = ""
 
     matching_model_path: str = str(ROOT / "data" / "synthetic" / "match_model.txt")
