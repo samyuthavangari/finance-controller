@@ -106,4 +106,4 @@ cd backend && pytest -q
 5. Audit `GATE_REJECTED_HALLUCINATION`  
 6. Cash 7/30-day + what-if  
 
-Secrets stay in `.env`, never in React.
+.
